@@ -11,24 +11,22 @@ A Smart Energy-Saving Room system built using an ESP32, PIR sensor, LDR, LED, an
 🛠️ Setup Instructions
 
 1. Clone this repository
+```
 git clone https://github.com/your-username/smart-trash-bin.git
+```
+3. Open the project in Arduino IDE or PlatformIO.
 
-2. Open the project in Arduino IDE or PlatformIO.
-
-3. Install the required library:
+4. Install the required library:
 - Blynk (for ESP32)
 
 4. Replace Blynk and Wi-Fi credentials inside the code:
-`#define BLYNK_TEMPLATE_ID "TMPL6bwT0r3FU"
-
+```
+#define BLYNK_TEMPLATE_ID "TMPL6bwT0r3FU"
 #define BLYNK_TEMPLATE_NAME "House occupancy detector"
-
 #define BLYNK_AUTH_TOKEN "your_auth_token"
-
 char ssid[] = "your_wifi_name";
-
 char pass[] = "your_wifi_password";
-`
+```
 
 5. Connect components according to the pin configuration below.
 
@@ -78,7 +76,7 @@ Dashboard Overview:
 - Electricity Used Graph: Plots real-time power consumption.
 - Hourly Counter Graph: Shows cumulative occupancy events over time.
 
-<img width="980" height="950" alt="image" src="https://github.com/user-attachments/assets/648f9f5e-4628-4be9-88aa-abde17aa170a" />
+<img width="580" height="550" alt="image" src="https://github.com/user-attachments/assets/648f9f5e-4628-4be9-88aa-abde17aa170a" />
 
 📜 License
 
