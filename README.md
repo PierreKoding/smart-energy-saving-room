@@ -1,14 +1,14 @@
 A Smart Energy-Saving Room system built using an ESP32, PIR sensor, LDR, LED, and stepper motor. The system detects room occupancy and ambient light intensity to automate lighting and demonstrate mechanical motion. Real-time sensor data and power usage are transmitted to a Blynk dashboard, allowing monitoring and basic energy management.
 
 
-🚀 Features
+**🚀 Features**
 - Automatic Occupancy Detection: PIR sensor detects motion and increases an hourly counter.
 - Light-Based LED Control: LED brightness adjusts automatically based on LDR readings.
 - Mechanical Demonstration: Stepper motor activates when occupancy is detected.
 - Power Monitoring: Calculates total power usage of LED and motor in watts.
 - Blynk Integration: Sends real-time data to the Blynk dashboard for live visualization.
 
-🛠️ Setup Instructions
+**🛠️ Setup Instructions**
 
 1. Clone this repository
 ```
@@ -34,12 +34,14 @@ char pass[] = "your_wifi_password";
 
 7. Open Blynk dashboard and configure widgets based on the mapping table.
 
-🧾 Example Output (Serial Monitor)
+**🧾 Example Output (Serial Monitor)**
+
 PIR: 1 | LDR: 2873 | Counter: 3 | Power (W): 2.407
+
 PIR: 0 | LDR: 3120 | Counter: 3 | Power (W): 0.0
 
 
-⚙️ Hardware Used
+**⚙️ Hardware Used**
 - ESP32 (DevKit V1)
 - PIR Sensor (HC-SR501 or equivalent)
 - LDR (Light Dependent Resistor)
@@ -54,7 +56,7 @@ PIR: 0 | LDR: 3120 | Counter: 3 | Power (W): 0.0
 | LED           | 14             | PWM output for brightness control |
 | Stepper Motor | 33, 25, 26, 27 | IN1–IN4 control pins              |
 
-🧠 How It Works
+**🧠 How It Works**
 
 1. The PIR sensor detects motion.
 2. When motion is detected, the LED turns on and adjusts its brightness according to the LDR value.
@@ -62,15 +64,15 @@ PIR: 0 | LDR: 3120 | Counter: 3 | Power (W): 0.0
 4. After 10 seconds of no motion, the LED and motor turn off automatically.
 5. The ESP32 calculates instantaneous power usage and sends data to Blynk via Wi-Fi.
 
-📡 Blynk Dashboard
+**📡 Blynk Dashboard**
 | Virtual Pin | Data Name        | Widget Type           | Description                                      |
 | ----------- | ---------------- | --------------------- | ------------------------------------------------ |
 | **V1**      | Occupancy        | Gauge / Value Display | Shows motion detection (1 = Occupied, 0 = Empty) |
 | **V2**      | LDR Reading      | Gauge                 | Displays ambient light intensity (0–4095)        |
 | **V3**      | Hourly Counter   | Graph                 | Tracks the number of occupancy events per hour   |
 | **V4**      | Electricity Used | Graph                 | Displays real-time power usage in watts          |
-Dashboard Overview:
 
+Dashboard Overview:
 - Occupancy Gauge: Indicates whether motion is currently detected.
 - LDR Reading: Reflects ambient light level to control LED brightness automatically.
 - Electricity Used Graph: Plots real-time power consumption.
@@ -78,7 +80,7 @@ Dashboard Overview:
 
 <img width="580" height="550" alt="image" src="https://github.com/user-attachments/assets/648f9f5e-4628-4be9-88aa-abde17aa170a" />
 
-📜 License
+**📜 License**
 
 This project is open-source and available under the MIT License.
 You are free to use, modify, and improve it for personal or educational purposes.
