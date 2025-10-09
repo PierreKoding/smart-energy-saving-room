@@ -19,8 +19,7 @@ git clone https://github.com/your-username/smart-trash-bin.git
 - Blynk (for ESP32)
 
 4. Replace Blynk and Wi-Fi credentials inside the code:
-
-#define BLYNK_TEMPLATE_ID "TMPL6bwT0r3FU"
+`#define BLYNK_TEMPLATE_ID "TMPL6bwT0r3FU"
 
 #define BLYNK_TEMPLATE_NAME "House occupancy detector"
 
@@ -29,6 +28,7 @@ git clone https://github.com/your-username/smart-trash-bin.git
 char ssid[] = "your_wifi_name";
 
 char pass[] = "your_wifi_password";
+`
 
 5. Connect components according to the pin configuration below.
 
