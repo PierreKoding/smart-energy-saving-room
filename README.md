@@ -1,4 +1,3 @@
-<img width="980" height="950" alt="image" src="https://github.com/user-attachments/assets/37ee22b2-f868-4169-9026-6612a8f4d9ac" />🏠 Smart Energy-Saving Room
 A Smart Energy-Saving Room system built using an ESP32, PIR sensor, LDR, LED, and stepper motor. The system detects room occupancy and ambient light intensity to automate lighting and demonstrate mechanical motion. Real-time sensor data and power usage are transmitted to a Blynk dashboard, allowing monitoring and basic energy management.
 
 
