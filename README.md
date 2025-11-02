@@ -12,7 +12,7 @@ A Smart Energy-Saving Room system built using an ESP32, PIR sensor, LDR, LED, an
 
 1. Clone this repository
 ```
-git clone https://github.com/your-username/smart-trash-bin.git
+git clone https://github.com/your-username/smart-energy-saving-room.git
 ```
 3. Open the project in Arduino IDE or PlatformIO.
 
