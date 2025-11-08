@@ -31,20 +31,17 @@ const char* WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";  // replace with your WiFi pas
 WiFiClientSecure secureClient;
 UniversalTelegramBot bot(BOT_TOKEN, secureClient);
 
-// --- Pin definitions ---
-const int LED_PIN = 14;
-const int LDR_PIN = 34;
-const int PIR_PIN = 12;
+// --- Sensor and actuator pin definitions ---
+const int LED_PIN = 14;   // PWM output for LED brightness control
+const int LDR_PIN = 34;   // Analog input for light intensity
+const int PIR_PIN = 12;   // Digital input from motion sensor (PIR)
 
-// --- Stepper pins ---
+
+// --- Stepper motor control pins (IN1–IN4 sequence) ---
 const int IN1 = 33;
 const int IN2 = 25;
 const int IN3 = 26;
 const int IN4 = 27;
-
-// --- Timing ---
-unsigned long lastPIRTime = 0;
-const unsigned long ON_DURATION = 10000; // LED & motor aktif 10 detik setelah deteksi PIR
 
 // --- Stepper motor half-step sequence ---
 int stepSequence[8][4] = {
@@ -58,58 +55,66 @@ int stepSequence[8][4] = {
   {1,0,0,1}
 };
 
-static int stepIndex = 0;
+static int stepIndex = 0;  // Tracks current step in sequence
 
-// --- Occupancy variables ---
-int pirValue;
-int lastPirValue = LOW;
-unsigned long lastMotionTime = 0;
-unsigned long idleThreshold = 10000; // 10s idle before next count
-int hourlyCounter = 0;
+// --- Timing control for motion and light ---
+unsigned long lastPIRTime = 0;             // Last time motion was detected
+const unsigned long ON_DURATION = 10000;   // Duration to keep LED/motor on after motion (ms)
+unsigned long lastMotionTime = 0;          // Last motion detection timestamp
+unsigned long idleThreshold = 10000;       // Threshold for counting new motion events (ms)
 
-// --- Power variables ---
-float ledPower = 0.007;   // W
-float motorPower = 2.4;   // W
-float totalPower = 0.0;   // W
+// --- Occupancy and motion tracking ---
+int pirValue;                              // Current PIR sensor reading
+int lastPirValue = LOW;                    // Previous PIR sensor state
+int hourlyCounter = 0;                     // Tracks number of motion events per hour
+
+// --- Power monitoring (in watts) ---
+float ledPower = 0.007;                    // LED power consumption (W)
+float motorPower = 2.4;                    // Stepper motor power (W)
+float totalPower = 0.0;                    // Total system power usage (W)
 
 // --- Telegram notification control ---
-bool motionNotified = false;
-unsigned long lastNotificationTime = 0;
-const unsigned long NOTIFICATION_COOLDOWN = 15000; // 15 detik agar tidak spam
+bool motionNotified = false;               // Prevents duplicate alerts
+unsigned long lastNotificationTime = 0;    // Last notification timestamp
+const unsigned long NOTIFICATION_COOLDOWN = 15000;  // Cooldown before next alert (ms)
 
 // --- Blynk control flags ---
-bool ledControl = false;
-bool motorControl = false;
+bool ledControl = false;                   // Manual LED control (from dashboard)
+bool motorControl = false;                 // Manual motor control (from dashboard)
 
 // === BLYNK SWITCH HANDLERS ===
-// V5 → Switch LED control
+// --- Manual LED control (Virtual Pin V5) ---
 BLYNK_WRITE(V5) {
   int state = param.asInt();
   ledControl = (state == 1);
+
   if (ledControl) {
-    analogWrite(LED_PIN, 255);  // nyalakan LED penuh
-    Serial.println("💡 LED control: ON");
+    analogWrite(LED_PIN, 255);  // Full brightness
+    Serial.println("LED manual control: ON");
   } else {
-    analogWrite(LED_PIN, 0);    // matikan LED
-    Serial.println("💡 LED control: OFF");
+    analogWrite(LED_PIN, 0);    // Turn off
+    Serial.println("LED manual control: OFF");
   }
 }
 
-// V6 → Switch Motor control
+
+// --- Manual Motor control (Virtual Pin V6) ---
 BLYNK_WRITE(V6) {
   int state = param.asInt();
   motorControl = (state == 1);
+
   if (motorControl) {
-    Serial.println("⚙️ Motor control: ON");
+    Serial.println("Motor manual control: ON");
   } else {
-    Serial.println("⚙️ Motor control: OFF");
-    stopStepper();
+    Serial.println("Motor manual control: OFF");
+    stopStepper();  // Ensure motor stops immediately
   }
 }
 
+
 // === SETUP ===
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(115200);  // Initialize serial monitor
 
   // WiFi + Blynk setup
   Serial.println("Connecting to WiFi...");
@@ -140,8 +145,9 @@ void setup() {
 
 // === LOOP ===
 void loop() {
-  Blynk.run();
+  Blynk.run();  // Maintain Blynk connection and handle dashboard updates
 
+  // Read Sensors
   pirValue = digitalRead(PIR_PIN);
   int ldrValue = analogRead(LDR_PIN);
   unsigned long currentTime = millis();
@@ -154,7 +160,7 @@ void loop() {
       Serial.print("New occupancy event, counter: ");
       Serial.println(hourlyCounter);
 
-      // === Kirim notifikasi Telegram ===
+      // === Send Telegram alert if cooldown elapsed ===
       if (!motionNotified || (currentTime - lastNotificationTime > NOTIFICATION_COOLDOWN)) {
         bot.sendMessage(CHAT_ID, "🚨 Gerakan terdeteksi di ruangan!", "");
         motionNotified = true;
@@ -165,16 +171,20 @@ void loop() {
   }
   lastPirValue = pirValue;
 
-  // --- Control LED & stepper motor ---
+  // --- LED and motor control logic ---
   if (pirValue == HIGH) lastPIRTime = currentTime;
 
+  // --- Automatic mode (no manual override active) ---
   if (!motorControl && !ledControl) {  // mode otomatis
     if (currentTime - lastPIRTime <= ON_DURATION) {
+      // Adjust LED brightness based on ambient light
       int brightness = map(ldrValue, 0, 4095, 0, 255);
       analogWrite(LED_PIN, brightness);
       rotateStepper(50, 2);
+      // Update total power usage
       totalPower = ledPower + motorPower;
     } else {
+      // Turn off components when idle
       analogWrite(LED_PIN, 0);
       stopStepper();
       totalPower = 0.0;
@@ -187,10 +197,10 @@ void loop() {
     }
   }
   
-  // --- Send data ke Blynk ---
-  Blynk.virtualWrite(V1, pirValue);
-  Blynk.virtualWrite(V2, ldrValue);
-  Blynk.virtualWrite(V4, totalPower);
+  // --- Send live data to Blynk dashboard ---
+  Blynk.virtualWrite(V1, pirValue);     // Occupancy status
+  Blynk.virtualWrite(V2, ldrValue);     // Light level
+  Blynk.virtualWrite(V4, totalPower);   // Power usage
 
   // --- Debug log ---
   Serial.print("PIR: ");
@@ -205,7 +215,7 @@ void loop() {
   delay(100);
 }
 
-// === Stepper motor rotation ===
+// --- Rotate stepper motor for given number of steps and delay ---
 void rotateStepper(int steps, int delayTime) {
   for (int i = 0; i < steps; i++) {
     digitalWrite(IN1, stepSequence[stepIndex][0]);
@@ -217,7 +227,7 @@ void rotateStepper(int steps, int delayTime) {
     delay(delayTime);
   }
 }
-
+// --- Immediately stop stepper motor ---
 void stopStepper() {
   digitalWrite(IN1, LOW);
   digitalWrite(IN2, LOW);
