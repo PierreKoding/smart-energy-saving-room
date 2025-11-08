@@ -39,6 +39,33 @@ char pass[] = "your_wifi_password";
 
 7. Open Blynk dashboard and configure widgets based on the mapping table.
 
+**📡 Communication Protocol Configuration**
+All communication protocol settings are defined directly within the main source code.
+The system integrates both MQTT (via Blynk Cloud) and HTTPS (via Telegram API):
+| Protocol             | Purpose                                         | Library Used             | Description                                                                   |
+| -------------------- | ----------------------------------------------- | ------------------------ | ----------------------------------------------------------------------------- |
+| **MQTT (TCP)**       | Data transmission between ESP32 and Blynk Cloud | `BlynkSimpleEsp32.h`     | Sends sensor readings and receives control commands from the Blynk dashboard. |
+| **HTTPS (REST API)** | Motion alert notifications                      | `UniversalTelegramBot.h` | Sends Telegram messages when motion is detected.                              |
+
+Network Configuration:
+```
+// Wi-Fi connection
+char ssid[] = "your_wifi_name";
+char pass[] = "your_wifi_password";
+
+// Blynk Cloud connection
+#define BLYNK_AUTH_TOKEN "your_auth_token"
+
+// Telegram Bot credentials
+#define BOT_TOKEN "YOUR_TELEGRAM_BOT_TOKEN"
+#define CHAT_ID "YOUR_TELEGRAM_CHAT_ID"
+```
+Communication Flow Summary:
+1. ESP32 connects to Wi-Fi for cloud access.
+2. Sensor readings (PIR, LDR, power) are transmitted to Blynk Cloud using MQTT.
+3. When motion is detected, ESP32 sends an alert via Telegram Bot using HTTPS requests.
+4. Manual LED and motor control commands are received from Blynk switches.
+
 **🧾 Example Output (Serial Monitor)**
 
 PIR: 1 | LDR: 2873 | Counter: 3 | Power (W): 2.407
