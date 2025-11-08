@@ -1,12 +1,13 @@
-#include <WiFi.h>
-#include <WiFiClient.h>
-#include <WiFiClientSecure.h>
-#include <BlynkSimpleEsp32.h>
-#include <UniversalTelegramBot.h>
-
-// --- Wi-Fi credentials ---
-const char* WIFI_SSID = "YOUR_WIFI_NAME";          // replace with your WiFi SSID
-const char* WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";  // replace with your WiFi password
+/******************************************************
+ * COMMUNICATION PROTOCOL CONFIGURATION
+ * ----------------------------------------------------
+ * Blynk: MQTT over TCP
+ * Server: blynk.cloud
+ * Data sent: Virtual Pins V1–V4 (PIR, LDR, Counter, Power)
+ * Telegram: HTTPS requests via UniversalTelegramBot library
+ * API Endpoint: https://api.telegram.org/bot<token>/sendMessage
+ * Wi-Fi: 2.4GHz network, WPA2
+ ******************************************************/
 
 // --- Blynk credentials ---
 #define BLYNK_TEMPLATE_ID "YOUR_TEMPLATE_ID"
@@ -16,6 +17,16 @@ const char* WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";  // replace with your WiFi pas
 // --- Telegram credentials ---
 #define BOT_TOKEN "YOUR_TELEGRAM_BOT_TOKEN"
 #define CHAT_ID "YOUR_TELEGRAM_CHAT_ID"
+
+// --- Wi-Fi credentials ---
+const char* WIFI_SSID = "YOUR_WIFI_NAME";          // replace with your WiFi SSID
+const char* WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";  // replace with your WiFi password
+
+#include <WiFi.h>
+#include <WiFiClient.h>
+#include <WiFiClientSecure.h>
+#include <BlynkSimpleEsp32.h>
+#include <UniversalTelegramBot.h>
 
 WiFiClientSecure secureClient;
 UniversalTelegramBot bot(BOT_TOKEN, secureClient);
